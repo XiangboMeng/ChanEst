@@ -1,8 +1,10 @@
 %% Initialization
-N_test = 1:5;                                       % 1:10 orginal
+N_test = 1:8;                                       % 1:10 orginal
 %N_test = 12:16;
 SVM_error = N_test*0;
 mmse_error = SVM_error;
+SVM_Q_error = SVM_error;
+mmse_Q_error = SVM_error;
 SNR_dB = -5;
 ave_num = 10000;                                   % 100000 original
 T = 300;
@@ -44,6 +46,7 @@ for loop1 = 1:length(N_test)
         end
         SVM_alg_err = norm(H_est-H);
         SVM_error(loop1) = SVM_error(loop1)+SVM_alg_err^2;
+        SVM_Q_error(loop1) = SVM_Q_error(loop1) + norm(normcdf(Y.*(H_est*B)*sqrt(10^(SNR_dB/10)/N))-normcdf(Y.*(H*B)*sqrt(10^(SNR_dB/10)/N)))^2;
         
         %% MMSE
         
@@ -56,6 +59,7 @@ for loop1 = 1:length(N_test)
         H_mmse = prob_y1'*H_test/sum(prob_y1);
         mmse = norm(H_mmse-H);
         mmse_error(loop1) = mmse_error(loop1)+mmse^2;
+        mmse_Q_error(loop1) = mmse_Q_error(loop1)+norm(normcdf(Y.*(H_mmse*B)*sqrt(10^(SNR_dB/10)/N))-normcdf(Y.*(H*B)*sqrt(10^(SNR_dB/10)/N)))^2;
         
         if(mod(loop2,1000)==0)
             loop2
@@ -63,6 +67,8 @@ for loop1 = 1:length(N_test)
     end
     SVM_error(loop1) = SVM_error(loop1)/ave_num/N;
     mmse_error(loop1) = mmse_error(loop1)/ave_num/N;
+    SVM_Q_error(loop1) = SVM_Q_error(loop1)/ave_num/N;
+    mmse_Q_error(loop1) = mmse_Q_error(loop1)/ave_num/N;
     N
 end
 
@@ -73,3 +79,13 @@ hold on
 plot(N_test, SVM_error,'b');
 legend('mmse','SVM')
 title(strcat('SNR=',num2str(SNR_dB),'dB'))
+savefig('MSE.fig')
+
+%% Plot new
+figure
+plot(N_test, mmse_Q_error,'r');
+hold on
+plot(N_test, SVM_Q_error,'b');
+legend('mmse','SVM')
+title(strcat('SNR=',num2str(SNR_dB),'dB'))
+savefig('Newerror.fig')
