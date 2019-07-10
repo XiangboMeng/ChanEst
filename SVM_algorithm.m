@@ -1,9 +1,9 @@
- N_test = 1:10;
+ N_test = 1:8;
 %N_test = 12:16;
 SVM_error = N_test*0;
 mmse_error = SVM_error;
 SNR_dB = -5;
-ave_num = 100000;
+ave_num = 10000;
 T = 300;
 for loop1 = 1:length(N_test)
 N = N_test(loop1);
@@ -43,7 +43,7 @@ SVM_error(loop1) = SVM_error(loop1)+SVM_alg_err^2;
     
 %% MMSE
 
-N_SIM = 100000;
+N_SIM = 1000;
 H_test = randn(N_SIM,N);
 y_test = (H_test*B);
 y_hat = y_test.*repmat(Y,N_SIM,1);
